@@ -1,58 +1,46 @@
-# -*- coding: utf-8 -*-
-"""
-Spyder Editor
-
-This is a temporary script file.
-"""
 import math
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy import interpolate
 
 l= np.matrix([1.0,2.0,3.0,4.0,5.0,6.0,7.0])
-#l = np.linspace(1., 7., 7)   
-I= np.matrix([0.0,0.1,0.3,0.6,1.0,1.5,2.1])
+l= np.asarray(l)
+l= l.flatten()
+  
+Il= np.matrix([0.0,0.1,0.3,0.6,1.0,1.5,2.1])
+Il= np.asarray(Il)
+Il= Il.flatten()
+
 w= 1/l
+Iw=Il/w**2
 
 res= 0.01
 D= np.max(w) - np.min(w)
 Nfloat= np.ceil(D/res)
-N = Nfloat.astype(int) 
-dw = D/Nfloat
+N= Nfloat.astype(int) 
+dw= D/Nfloat
 
 we= np.linspace(np.min(w), np.max(w), N)
+lin= interpolate.interp1d(w, Iw, kind='linear')
+Ie= lin(we)
 
-#l= l.transpose()
-#I= I.transpose()
+dres= 0.05
+Nfloat= np.ceil(D/dres)
+Nr= Nfloat.astype(int)
+dwr= D/Nfloat
 
-print(l)
+wr= np.linspace(np.min(we), np.max(we), Nr)
+cub= interpolate.interp1d(we, Ie, kind='cubic')
+Ir= cub(wr)
+
 print(w)
-print(I)
 print(we)
+print(wr)
+print(Iw)
+print(Ie)
+print(Ir)
 
-#Need loop to make array
- 
-i= 30
-d= w - we[i]
-da= np.abs(d)
-mda= np.min(da)
-j= np.flatnonzero(da==mda)
-sfloat= mda/d[0,j]
-s= sfloat.astype(int) 
-
-#print(d)
-#print(da)
-#print(s)
-
-if np.min(d)==0:
-    In= I[0,j]
-elif s==1:
-    In= (I[0,j + 1] - I[0,j])*(we[i] - w[0,j])/(w[0,j + 1] - w[0,j]) + I[0,j]
-else:
-    In= (I[0,j] - I[0,j - 1])*(we[i] - w[0,j - 1])/(w[0,j] - w[0,j - 1]) + I[0,j - 1]
-print(we[i])
-print(In)
-
-#plt.subplot(211)
-#plt.plot(l[0].transpose(),I[0].transpose())
-#plt.subplot(212)
-plt.plot(w[0].transpose(),I[0].transpose())
+plt.subplot(211)
+plt.plot(we,Ie)
+plt.subplot(212)
+plt.plot(wr,Ir)
