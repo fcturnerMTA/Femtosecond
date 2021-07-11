@@ -1,4 +1,3 @@
-import math
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy import interpolate
@@ -14,7 +13,9 @@ Il= Il.flatten()
 w= 1/l
 Iw=Il/w**2
 
-res= 0.01
+print(np.min(np.abs(w-np.roll(w,1))))
+print(w)
+res= np.min(np.abs(w - np.roll(w, 1)))
 D= np.max(w) - np.min(w)
 Nfloat= np.ceil(D/res)
 N= Nfloat.astype(int) 
@@ -24,23 +25,21 @@ we= np.linspace(np.min(w), np.max(w), N)
 lin= interpolate.interp1d(w, Iw, kind='linear')
 Ie= lin(we)
 
-dres= 0.05
-Nfloat= np.ceil(D/dres)
-Nr= Nfloat.astype(int)
-dwr= D/Nfloat
+# print(w)
+# print(we)
+# print(wr)
+# print(Iw)
+# print(Ie)
+# print(Ir)
+# print(np.sum(Il))
+# print(np.sum(Ie)*dw)
+# print(np.sum(Ir)*dwr)
 
-wr= np.linspace(np.min(we), np.max(we), Nr)
-cub= interpolate.interp1d(we, Ie, kind='cubic')
-Ir= cub(wr)
-
-print(w)
-print(we)
-print(wr)
-print(Iw)
-print(Ie)
-print(Ir)
 
 plt.subplot(211)
 plt.plot(we,Ie)
 plt.subplot(212)
-plt.plot(wr,Ir)
+plt.plot(l,Il)
+
+print(np.trapz(Ie, dx=dw))
+print(np.trapz(Il, dx=1))
