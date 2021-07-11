@@ -10,7 +10,7 @@ from scipy import interpolate
 # Il= np.asarray(Il)
 # Il= Il.flatten()
 
-l= np.linspace(700, 750, 50)
+l= np.linspace(700, 750, 10000)
 Il= np.exp(-(l-725)**2/2/5**2)
 
 w= 1e7/l
