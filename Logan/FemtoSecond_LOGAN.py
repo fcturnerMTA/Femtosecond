@@ -1,4 +1,5 @@
 import math
+from typing import final
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import animation
@@ -87,13 +88,19 @@ side= (omegaIntervals - 1)/2
 # TODO: #RegenSpec = sconvert.manualInterpolateRegenSpec(RegenSpec, 1000)
 # ^ Add in support for manual number of points
 # TODO: Add support for manual specify Stokes/Pump Frequencies
+#RegenSpec = sconvert.readAndNormalize(filePath)
+numOrders=30
+ramanSep=587
+pump=18939
 def buildData():
     """
     Import the regen spectrum from the specified file path.
     Determine resolution, frequency spacing, index spacing.
     """
     #RegenSpec = sconvert.readAndNormalize(filePath)
-    RegenSpec = sconvert.defineBasicTWO(18900,587,10,0,1)
+    numOrders=30
+    ramanSep=587
+    RegenSpec = sconvert.defineBasicTWO(pump,ramanSep,numOrders,0,Intensity)
     omegaReg = RegenSpec[0]
     IntensReg = RegenSpec[1]
 
@@ -152,9 +159,9 @@ def initializeFrequencies():
     linspace to create a range from rectified min and max
     using numPoints points.
     """
-    simulationMaxW = 100000
+    simulationMaxW = 70000
     simulationMinW = 0
-    frewWindowHALF = 200
+    frewWindowHALF = 100
 
     minW = omegaReg[0]
     maxW = omegaReg[-1]
@@ -229,12 +236,13 @@ Q = 0 + 0j
 #dz = 10
 ## COPY OF VARIABLES UP TOP FOR EASY TESTING
 FibreLength= 1
-Intervals= 4000
+Intervals= 3000
 dz= FibreLength/Intervals
 #g = 1.6e-13
 #plotmin = 1e-13
-plotmin = 1e-12
-g = 1e-2
+plotmin = 1e-3
+g = 0.14
+##g= 1.6e-13
 #Intervals= 1000
 #g = 4e-15
 Index1 = Indices[0] + Intensindex
@@ -248,6 +256,7 @@ time1 = time0
 numTotal = FibreLength * Intervals
 print("Start Loop")
 for z in range(numTotal): 
+
     for n in range(int (numPoints) - IndexSeperation):
         Q = Q + B[n + IndexSeperation]*np.conjugate(B[n])*np.exp( -1j *(k[n + IndexSeperation] - k[n])*dz)
 
@@ -278,15 +287,33 @@ for z in range(numTotal):
 SurfaceGraph = Amplitudes*np.conjugate(Amplitudes)
 #print(C.imag)
 tempindex = (numTotal-1)
+
+##
+finalIntens = C*np.conjugate(C)
+print(np.max(finalIntens))
+finalIntens = finalIntens/np.max(finalIntens)
+finalIntens = np.log10((finalIntens.real) + plotmin)
+components = (omega - pump)/ramanSep
+plt.subplot(211)
+plt.xlim(-30, 30)
+plt.plot(components,finalIntens)
+##
+
+'''
 plt.subplot(211)
 end = int (pumpindex +((omegaRaman//wres) * 20))
 tmp = np.log10((SurfaceGraph.real[tempindex]*np.conjugate(SurfaceGraph.real[tempindex]) + plotmin))
+plt.ylim=(0,np.max(tmp))
+val = int (pump + ramanSep*numOrders)
+print(val)
+plt.xlim(0.0, val)
 plt.plot(omega,tmp)
+'''
+
 eField = fft(Amplitudes[tempindex])
 eField = np.fft.ifftshift(eField)
 
 plt.subplot(212)
-print(np.size(omega))
 #[100:200]
 plt.plot(omega,eField.real)
 plt.show()
